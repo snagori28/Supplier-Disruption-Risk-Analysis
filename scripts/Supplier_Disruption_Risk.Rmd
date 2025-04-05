@@ -1,0 +1,378 @@
+---
+title: "Supplier Disruption Risk Assessment"
+author: "Shrijeet Nagori"
+date: "2023-04-22"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# SUPPLIER DISRUPTION RISK ASSESSMENT
+# Author : Shrijeet Nagori
+
+## Load the dataset
+
+```{r}
+d = read.csv("Supplier_Disruption_Risk.csv")
+head(d)
+```
+
+## PART A: Graphical exploration of the data
+
+```{r}
+colnames(d)
+```
+Except SupplierID every other variable is a continous variable. Let us create a new dataset which excludes SupplierID. Also note that we must convert the SupplyDisruption into factor.
+
+```{r}
+# Subset the data to keep only the continuous variables and the response variable
+df <- d[, c("SupplyDisruption", "NumberOfCustomers", "AverageShareofBusiness", "AverageSizeofSuppliers",
+                        "AverageSizeofCustomers", "CAGRBusiness", "TechnologyInvestment", "CountryGDP", 
+                        "CountryGDPGrowth", "IndexOfPoliticalTurmoil", "IndexOfSocialTurmoil", "NumberofProducts", 
+                        "NumberofNewProducts", "ProfitabilityLast5Years")]
+
+# Convert the SupplyDisruption variable to a factor
+df$SupplyDisruption <- factor(df$SupplyDisruption)
+
+# Create a list of the continuous variable names
+cont_vars <- c("NumberOfCustomers", "AverageShareofBusiness", "AverageSizeofSuppliers",
+               "AverageSizeofCustomers", "CAGRBusiness", "TechnologyInvestment", "CountryGDP", 
+               "CountryGDPGrowth", "IndexOfPoliticalTurmoil", "IndexOfSocialTurmoil", "NumberofProducts", 
+               "NumberofNewProducts", "ProfitabilityLast5Years")
+```
+
+### 1. Create box plots for all continuous variables against supply chain disruption. One side-by-side box plot for class 0 and class 1 is required. 
+
+```{r}
+# Create box plots for each continuous variable against SupplyDisruption
+for (var in cont_vars) {
+  boxplot(df[, var] ~ df$SupplyDisruption, data = df,
+          xlab = "SupplyDisruption", ylab = var, main = var)
+}
+```
+
+### 2. Comment on each of the continuous variables’ ability to discriminate between the two classes.
+
+NumberOfCustomers: The box plot distributions for the two classes are somewhat different, but there is a lot of overlap between the two distributions. This variable may have some ability to discriminate between the two classes, but it is not a very strong discriminator.
+
+AverageShareofBusiness: The box plot distributions for the two classes are quite different, with a clear separation between the two distributions. This variable appears to be a strong discriminator between the two classes
+
+AverageSizeofSuppliers: The box plot distributions for the two classes are somewhat similar and there is a lot of overlap between the two distributions. This variable may have some ability to discriminate between the two classes, but it is not a very strong discriminator.
+
+AverageSizeofCustomers: The box plot distributions for the two classes are somewhat different, but there is a lot of overlap between the two distributions. This variable may have some ability to discriminate between the two classes, but it is not a very strong discriminator.
+
+CAGRBusiness: The box plot distributions for the two classes are quite different, with a clear separation between the two distributions. This variable appears to be a strong discriminator between the two classes.
+
+TechnologyInvestment: The box plot distributions for the two classes are somewhat different. This variable appears to be a weak discriminator between the two classes.
+
+CountryGDP: The box plot distributions for the two classes are somewhat different, but there is a lot of overlap between the two distributions. This variable may have some ability to discriminate between the two classes, but it is not a very strong discriminator.
+
+CountryGDPGrowth: The box plot distributions for the two classes are somewhat different, but there is a lot of overlap between the two distributions. This variable may have some ability to discriminate between the two classes, but it is not a very strong discriminator.
+
+IndexOfPoliticalTurmoil: The box plot distributions for the two classes are quite different, with a clear separation between the two distributions. This variable appears to be a strong discriminator between the two classes.
+
+IndexOfSocialTurmoil: The box plot distributions for the two classes are quite different, with a clear separation between the two distributions. This variable appears to be a strong discriminator between the two classes.
+
+NumberofProducts: The box plot distributions for the two classes are somewhat different, but there is a lot of overlap between the two distributions. This variable may have some ability to discriminate between the two classes, but it is not a very strong discriminator.
+
+NumberofNewProducts: The box plot distributions for the two classes are quite different, with a clear separation between the two distributions. This variable appears to be a strong discriminator between the two classes.
+
+ProfitabilityLast5Years: The box plot distributions for the two classes are quite different, with a clear separation between the two distributions. This variable appears to be a strong discriminator between the two classes.
+
+### 3. Select at least eight variables that you feel are most discriminative. This need not be exact. For the rest of the questions, you will use these variables. Note that your selection may be different from others’ selections. That is perfectly fine. 
+
+The following variables are the most discriminative : NumberOfCustomers, AverageShareofBusiness, CAGRBusiness, TechnologyInvestment, IndexOfPoliticalTurmoil, IndexOfSocialTurmoil, NumberofNewProducts,ProfitabilityLast5Years
+
+## PART B : DATA PREPARATION
+
+### 1. Run the command set.seed(1234). Then randomly select 80% of the observations in training dataset (call ‘train’) and the rest of the observations in testing dataset (call ‘test’)
+
+```{r}
+set.seed(1234) # set seed for reproducibility
+train_indices <- sample(seq_len(nrow(df)), size = floor(0.8*nrow(df)), replace = FALSE) # randomly select 80% of indices for training
+train <- df[train_indices, ] # create training dataset
+test <- df[-train_indices, ] # create testing dataset with the rest of the observations
+```
+
+###2.  For both training and testing datasets, only retain the variables that you selected in the first question. 
+
+```{r}
+selected_vars <- c("NumberOfCustomers", "AverageShareofBusiness", "CAGRBusiness", "TechnologyInvestment", "IndexOfPoliticalTurmoil", "IndexOfSocialTurmoil", "NumberofNewProducts", "ProfitabilityLast5Years", "SupplyDisruption")
+
+train <- train[, selected_vars] # only retain selected variables in training dataset
+test <- test[, selected_vars] # only retain selected variables in testing dataset
+```
+
+## PART C: RUN CLASSIFICATION MODELS AND PREDICT
+
+###1.  Fit a logistic regression, random forest (with 500 trees), support vector machine (with ‘radial basis’ kernel) and neural network (with only two hidden layers, each hidden layer having the same number of nodes as the input data, set the other parameters the same as the class example). Use train sample to fit all models.
+
+```{r}
+# Logistic Regression
+logit_model <- glm(SupplyDisruption ~ ., data = train, family = "binomial")
+```
+
+```{r}
+# Random Forest
+
+library(randomForest)
+
+# fit random forest model
+rf_model <- randomForest(SupplyDisruption ~ ., data = train, ntree = 500)
+```
+
+```{r}
+# Support Vector machine
+
+library(e1071)
+
+# fit support vector machine model
+svm_model <- svm(SupplyDisruption ~ ., data = train, probability = TRUE, kernel = "radial")
+```
+
+```{r}
+# Neural Network
+
+library(neuralnet)
+
+# Set up data and model
+nn_model = neuralnet(
+    SupplyDisruption~., data = train,
+  hidden=c(8,8),
+  act.fct = "logistic",
+  linear.output = FALSE,
+  stepmax=1e6,
+  threshold = 0.5
+)
+
+```
+
+###2. For each model predict the probability of supply chain disruption (class 1) in the test data.
+
+```{r}
+# Logistic regression
+log_reg_prob <- predict(logit_model, newdata = test, type = "response")
+log_reg_prob <- log_reg_prob[1:nrow(test)]
+
+# Random forest
+rf_prob <- predict(rf_model, newdata = test, type = "prob")[, 2]
+rf_prob <- rf_prob[1:nrow(test)]
+
+# Support vector machine
+svm_prob <- predict(svm_model, newdata = test, probability = TRUE)
+svm_prob = attr(svm_prob, "probabilities")[,1]
+svm_prob <- svm_prob[1:nrow(test)]
+
+# Neural network
+nn_prob <- predict(nn_model, newdata = test, type="raw")
+nn_prob <- nn_prob[1:nrow(test)]
+```
+
+###3.  For the predicted probabilities for all the four models, create a box plot (for each model) of the predicted probabilities against the test sample classes. Comment on the discriminative capacity of each model. 
+
+```{r}
+library(ggplot2)
+
+# create data frame with test sample classes and predicted probabilities for each model
+predictions <- data.frame(
+  Model = rep(c("Logistic Regression", "Random Forest", "Support Vector Machine", "Neural Network"), each = length(test$SupplyDisruption)),
+  SupplyDisruption = rep(test$SupplyDisruption, times = 4),
+  Probability = c(log_reg_prob, rf_prob, svm_prob, nn_prob)
+)
+
+# create box plots
+ggplot(predictions, aes(x = Model, y = Probability, fill = factor(SupplyDisruption))) + 
+  geom_boxplot() + 
+  labs(title = "Box Plots of Predicted Probabilities by Model and Test Sample Class",
+       x = "Model",
+       y = "Predicted Probability") +
+  theme_bw()
+```
+
+Based on the box plots, we can see that all four models have some discriminative capacity, but some models are better than others. The logistic regression and random forest models appear to have the best discriminative capacity, with relatively little overlap between the predicted probabilities for the two classes. The support vector machine and neural network models, on the other hand, have more overlap between the predicted probabilities for the two classes, suggesting that they may not be as good at distinguishing between cases with and without supply chain disruption.
+
+## PART D: Performance comparison on the test sample
+
+###1. Use a decision threshold equal to the median (ex. Median(p)) of the predicted probabilities. Create the contingency table / confusion matrix of each of the predictions for this threshold. 
+
+```{r}
+# Calculate median probability for each model
+log_reg_median_prob <- median(log_reg_prob)
+rf_median_prob <- median(rf_prob)
+svm_median_prob <- median(svm_prob)
+nn_median_prob <- median(nn_prob)
+```
+
+```{r}
+# Create predicted classes for each model using median probability as threshold
+log_reg_pred <- ifelse(log_reg_prob >= log_reg_median_prob, 1, 0)
+rf_pred <- ifelse(rf_prob >= rf_median_prob, 1, 0)
+svm_pred <- ifelse(svm_prob >= svm_median_prob, 1, 0)
+nn_pred <- ifelse(nn_prob >= nn_median_prob, 1, 0)
+```
+
+```{r}
+# Create contingency table/confusion matrix for each model using median probability as threshold
+log_reg_tab <- table(log_reg_pred, test$SupplyDisruption)
+rf_tab <- table(rf_pred, test$SupplyDisruption)
+svm_tab <- table(svm_pred, test$SupplyDisruption)
+nn_tab <- table(nn_pred, test$SupplyDisruption)
+```
+
+```{r}
+# Print contingency table/confusion matrix for each model
+cat("Logistic Regression:\n")
+print(log_reg_tab)
+cat("\n")
+
+cat("Random Forest:\n")
+print(rf_tab)
+cat("\n")
+
+cat("Support Vector Machine:\n")
+print(svm_tab)
+cat("\n")
+
+cat("Neural Network:\n")
+print(nn_tab)
+cat("\n")
+```
+
+###2. Compute the sensitivity, specificity, and accuracy measures for each model. Comment on what you observe and compare the models. 
+
+```{r}
+# Define a function to compute sensitivity, specificity, and accuracy
+compute_metrics <- function(predicted, actual) {
+  tp <- sum(predicted == 1 & actual == 1)
+  tn <- sum(predicted == 0 & actual == 0)
+  fp <- sum(predicted == 1 & actual == 0)
+  fn <- sum(predicted == 0 & actual == 1)
+  
+  sensitivity <- tp / (tp + fn)
+  specificity <- tn / (tn + fp)
+  accuracy <- (tp + tn) / (tp + tn + fp + fn)
+  
+  return(list(sensitivity = sensitivity, specificity = specificity, accuracy = accuracy))
+}
+
+# Compute the metrics for each model
+log_reg_metrics <- compute_metrics(log_reg_pred, test$SupplyDisruption)
+rf_metrics <- compute_metrics(rf_pred, test$SupplyDisruption)
+svm_metrics <- compute_metrics(svm_pred, test$SupplyDisruption)
+nn_metrics <- compute_metrics(nn_pred, test$SupplyDisruption)
+
+# Print the metrics for each model
+print("Logistic Regression:")
+print(log_reg_metrics)
+print("Random Forest:")
+print(rf_metrics)
+print("Support Vector Machine:")
+print(svm_metrics)
+print("Neural Network:")
+print(nn_metrics)
+```
+The logistic regression and random forest models have the highest sensitivity (ability to correctly identify positive cases) of 1, while the SVM and neural network models have much lower sensitivities. The specificity (ability to correctly identify negative cases) is relatively low for all models, with the highest being 0.58 for logistic regression and random forest. The accuracy of logistic regression and random forest are similar and are the highest among the models, with SVM and neural network having significantly lower accuracy. Overall, the logistic regression and random forest models seem to have the best discriminative capacity and ability to predict supply chain disruptions accurately.
+
+###3. Plot the ROC curves for each model’s prediction on the test data. Compare the AUC-ROC of each model. Comment on the model comparisons and which model is best predictor.
+
+```{r}
+library(pROC)
+
+# ROC curve for logistic regression model
+log_reg_roc <- roc(test$SupplyDisruption, log_reg_prob)
+
+# ROC curve for random forest model
+rf_roc <- roc(test$SupplyDisruption, rf_prob)
+
+# ROC curve for support vector machine model
+svm_roc <- roc(test$SupplyDisruption, svm_prob)
+
+# ROC curve for neural network model
+nn_roc <- roc(test$SupplyDisruption, nn_prob)
+
+# plot ROC curves for all models
+plot(log_reg_roc, col = "red", main = "ROC Curves for Supply Chain Disruption Models")
+lines(rf_roc, col = "blue")
+lines(svm_roc, col = "green")
+lines(nn_roc, col = "purple")
+
+# add legend
+legend("bottomright", 
+       legend = c("Logistic Regression", "Random Forest", "Support Vector Machine", "Neural Network"),
+       col = c("red", "blue", "green", "purple"),
+       lty = 1)
+
+```
+
+```{r}
+# Print AUC values
+logit_auc <- auc(log_reg_roc)
+rf_auc <- auc(rf_roc)
+svm_auc <- auc(svm_roc)
+nn_auc <- auc(nn_roc)
+
+cat("Logistic Regression AUC:", logit_auc, "\n")
+cat("Random Forest AUC:", rf_auc, "\n")
+cat("Support Vector Machine AUC:", svm_auc, "\n")
+cat("Neural Network AUC:", nn_auc, "\n")
+```
+The ROC curves and AUC values indicate that the logistic regression, random forest, and support vector machine models have similar predictive performance with AUC values between 0.95 and 0.96. The neural network model has a lower AUC value of 0.91. Overall, the logistic regression and random forest models appear to be slightly better predictors compared to the support vector machine and neural network models.
+
+## PART E: OPTIMAL DECISION THRESHOLD
+
+###1. Use only the prediction for the logistic model and random forest and compute the optimal decision threshold using the test predictions for the two models and a cost of 0.9 and 1 for false positive and false negative errors respectively. 
+
+```{r}
+library(ROCR)
+
+# Create a prediction object for logistic regression and random forest
+log_reg_prediction <- prediction(log_reg_prob, test$SupplyDisruption)
+rf_prediction <- prediction(rf_prob, test$SupplyDisruption)
+
+# Calculate the true positive rate (TPR) and false positive rate (FPR) for different decision thresholds
+log_reg_perf <- performance(log_reg_prediction, "tpr", "fpr")
+rf_perf <- performance(rf_prediction, "tpr", "fpr")
+
+# Calculate the cost for different decision thresholds
+cost_df <- data.frame(Threshold = seq(0, 1, 0.01))
+cost_df$Log_Reg_Cost <- cost_df$RF_Cost <- 0
+for (i in 1:nrow(cost_df)) {
+  threshold <- cost_df$Threshold[i]
+  log_reg_pred_class <- ifelse(log_reg_prob > threshold, 1, 0)
+  rf_pred_class <- ifelse(rf_prob > threshold, 1, 0)
+  log_reg_cost <- sum(ifelse(log_reg_pred_class == 0 & test$SupplyDisruption == 1, 1, 0)) * 1 +
+    sum(ifelse(log_reg_pred_class == 1 & test$SupplyDisruption == 0, 1, 0)) * 0.9
+  rf_cost <- sum(ifelse(rf_pred_class == 0 & test$SupplyDisruption == 1, 1, 0)) * 1 +
+    sum(ifelse(rf_pred_class == 1 & test$SupplyDisruption == 0, 1, 0)) * 0.9
+  cost_df$Log_Reg_Cost[i] <- log_reg_cost
+  cost_df$RF_Cost[i] <- rf_cost
+}
+
+# Find the optimal decision threshold for logistic regression and random forest
+log_reg_optimal_threshold <- cost_df$Threshold[which.min(cost_df$Log_Reg_Cost)]
+rf_optimal_threshold <- cost_df$Threshold[which.min(cost_df$RF_Cost)]
+
+
+```
+
+```{r}
+print("Logit optimal threshold")
+print(log_reg_optimal_threshold)
+print("Random forest optimal threshold")
+print(rf_optimal_threshold)
+```
+###2. What did you learn from this exercise ?
+
+I was asked to build four different models to predict the probability of a supply chain disruption. I built logistic regression, random forest, support vector machine, and neural network models using the training data. After training the models, I evaluated their performance on the test set. I predicted the probability of a supply chain disruption using each of the models and created a box plot of the predicted probabilities for each model.
+
+Next, I created a confusion matrix for each model using the median of the predicted probabilities as the decision threshold. I calculated sensitivity, specificity, and accuracy measures for each model and compared their performance. I found that logistic regression and random forest models performed the best with accuracy of 0.637 and 0.636 respectively.
+
+To further compare the models, I plotted ROC curves and calculated the AUC-ROC for each model. I found that logistic regression, random forest, and support vector machine models had similar AUC values around 0.96, while the neural network model had a lower AUC value of 0.91.
+
+Finally, I used the logistic regression and random forest models to compute the optimal decision threshold using the test predictions and a cost of 0.9 and 1 for false positive and false negative errors respectively. I found that the optimal thresholds for logistic regression and random forest models were 0.54 and 0.34 respectively.
+
+Overall, this exercise allowed me to gain hands-on experience in building, evaluating, and comparing different machine learning models for a binary classification problem.
