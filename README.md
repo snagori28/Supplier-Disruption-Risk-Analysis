@@ -23,23 +23,29 @@ Supplier disruptions are among the most impactful risks in global supply chains.
 
 - **Location**: `data/Supplier_Disruption_Risk.csv`
 - **No. of Observations**: ~100+
-- **Target Variable**: `disruption_risk` (Binary: Yes/No)
+- **Target Variable**: `SupplyDisruption` (Binary: Yes/No)
 
 ---
 
 ## 🧬 Feature Descriptions
 
-| Feature                  | Description                                                                 |
-|--------------------------|-----------------------------------------------------------------------------|
-| `supplier_id`            | Unique identifier for each supplier                                         |
-| `financial_risk_score`   | Score (0-100) based on financial health                                     |
-| `environmental_score`    | Score (0-100) reflecting ESG factors                                         |
-| `geo_risk_rating`        | Geographic disruption risk (Low/Medium/High)                                |
-| `previous_disruptions`  | Count of disruptions in the past 3 years                                     |
-| `on_time_delivery_rate` | % of orders delivered on time                                                |
-| `product_diversity`      | Count of distinct products supplied                                          |
-| `years_of_relationship` | Duration of supplier engagement in years                                     |
-| `disruption_risk`        | Binary label - whether the supplier was disrupted (Yes/No)                  |
+| Feature                      | Description                                                                 |
+|------------------------------|-----------------------------------------------------------------------------|
+| `SupplierID`                 | Unique identifier for each supplier                                         |
+| `NumberOfCustomers`          | Number of customers the supplier serves                                     |
+| `AverageShareofBusiness`     | Average % share of business a supplier holds with each customer             |
+| `AverageSizeofSuppliers`     | Average size (revenue or volume) of suppliers working with this supplier    |
+| `AverageSizeofCustomers`     | Average size of customers served by the supplier                            |
+| `CAGRBusiness`               | Compound Annual Growth Rate of the supplier's business                      |
+| `TechnologyInvestment`       | Investment in technology as a % of revenue                                  |
+| `CountryGDP`                 | GDP of the country where the supplier is based                              |
+| `CountryGDPGrowth`           | GDP growth rate of the supplier's country                                   |
+| `IndexOfPoliticalTurmoil`   | Political instability index (higher means more instability)                 |
+| `IndexOfSocialTurmoil`      | Social instability index (higher means more unrest)                         |
+| `NumberofProducts`           | Number of different products offered                                        |
+| `NumberofNewProducts`        | Number of new products launched recently                                    |
+| `ProfitabilityLast5Years`    | Average profitability across the last 5 years                               |
+| `SupplyDisruption`           | Target variable - whether a disruption occurred (Yes/No)                    |
 
 ---
 
