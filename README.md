@@ -126,7 +126,7 @@ Supplier_Disruption_Risk/
 ## 🛠️ Technologies Used
 
 - **Language**: R
-- **Libraries**: `tidyverse`, `ggplot2`, `caret`, `pROC`, `plotly`, `knitr`
+- **Libraries**: `pROC`, `plotly`, `knitr`
 - **IDE**: RStudio
 - **Documentation**: RMarkdown
 - **Output**: Interactive HTML report
