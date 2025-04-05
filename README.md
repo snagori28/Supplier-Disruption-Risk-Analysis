@@ -98,12 +98,8 @@ Here are some key charts and visualizations created in the analysis:
 
 ## 🖼️ Screenshots
 
-| Screenshot Description                   | Preview |
-|------------------------------------------|---------|
-| Correlation Heatmap                      | ![](screenshots/correlation_heatmap.png) |
-| Boxplot of Financial Risk vs Disruption  | ![](screenshots/boxplot_financial_score.png) |
-| Logistic Regression Confusion Matrix     | ![](screenshots/confusion_matrix.png) |
-| AUC-ROC Curve                            | ![](screenshots/roc_curve.png) |
+### 📊 ROC Curve
+![ROC Curve](screenshots/ROC_Curve.png)
 
 ---
 
