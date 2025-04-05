@@ -114,9 +114,6 @@ Supplier_Disruption_Risk/
 ├── output/
 │   └── Supplier_Disruption_Risk.html
 ├── screenshots/
-│   └── correlation_heatmap.png
-│   └── boxplot_financial_score.png
-│   └── confusion_matrix.png
 │   └── roc_curve.png
 └── README.md
 ```
