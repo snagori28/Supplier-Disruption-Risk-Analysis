@@ -99,8 +99,6 @@ Here are some key charts and visualizations created in the analysis:
 | Logistic Regression Confusion Matrix     | ![](screenshots/confusion_matrix.png) |
 | AUC-ROC Curve                            | ![](screenshots/roc_curve.png) |
 
-> 📸 Add your PNGs in the `screenshots/` folder and rename accordingly.
-
 ---
 
 ## 🗂️ File Structure
